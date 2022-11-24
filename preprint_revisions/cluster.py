@@ -1,10 +1,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
 import argparse
 import re
-import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
