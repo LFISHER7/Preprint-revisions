@@ -1,5 +1,6 @@
 import json
 
+
 def load_json(filename):
     """
     This function takes a json file and returns a dictionary
@@ -8,10 +9,11 @@ def load_json(filename):
     Returns:
         data (dict): dictionary
     """
-    
+
     with open(filename, "r") as f:
         data = json.load(f)
     return data
+
 
 def save_to_json(data, filename):
     """
@@ -20,9 +22,10 @@ def save_to_json(data, filename):
         data (list): dictionary
         filename (str): name of json file to save data to
     """
-    
+
     with open(filename, "w") as f:
         json.dump(data, f)
+
 
 if __name__ == "__main__":
     pass

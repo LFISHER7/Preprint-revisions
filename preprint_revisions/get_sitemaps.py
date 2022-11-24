@@ -16,7 +16,7 @@ def get_sitemap_urls(server):
     urls = []
     sitemap_url = f"https://www.{server}.org/sitemap.xml"
     response = requests.get(sitemap_url)
-    
+
     soup = BeautifulSoup(response.text, "xml")
     sitemap_tags = soup.find_all("sitemap")
 
@@ -26,7 +26,6 @@ def get_sitemap_urls(server):
         urls.append(sitemap.findNext("loc").text)
 
     return urls
-
 
 
 def get_urls_from_sitemap(sitemap_tag):
@@ -52,11 +51,16 @@ def parse_args():
     This function parses arguments
     """
 
-    parser = argparse.ArgumentParser(description="Get sitemap tags from biorxiv and medrxiv")
-    parser.add_argument("--server", type=str, help="preprint server to get sitemap tags for")
+    parser = argparse.ArgumentParser(
+        description="Get sitemap tags from biorxiv and medrxiv"
+    )
+    parser.add_argument(
+        "--server", type=str, help="preprint server to get sitemap tags for"
+    )
     args = parser.parse_args()
 
     return args
+
 
 def main():
     """
@@ -68,9 +72,10 @@ def main():
     sitemap_urls = get_sitemap_urls(server)
     urls = {}
     for url in sitemap_urls:
-        urls[url] = (get_urls_from_sitemap(url))
-    
+        urls[url] = get_urls_from_sitemap(url)
+
     save_to_json(urls, f"{DATA_DIR}/{server}_urls.json")
+
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,6 @@ from util.config import DATA_DIR
 # make call to medrxiv API and fetch all preprints
 
 
-
 # turn while loop into a function
 def get_data(server, start_date, end_date):
     """
@@ -18,7 +17,7 @@ def get_data(server, start_date, end_date):
         end_date (str): end date in format YYYY-MM-DD
     Returns:
         extracted_data (list): list of dictionaries
-    """    
+    """
 
     preprint_url = f"https://api.biorxiv.org/pubs/{server}/{start_date}/{end_date}"
     extracted_data = []
@@ -29,27 +28,37 @@ def get_data(server, start_date, end_date):
         page += 1
         response = requests.get(f"{preprint_url}/{item}")
         response_json = response.json()
-        if not response_json["messages"][0]["status"] == 'ok':
+        if not response_json["messages"][0]["status"] == "ok":
             break
-        
+
         extracted_data.extend(response_json["collection"])
-        item+=response_json["messages"][0]["count"] 
+        item += response_json["messages"][0]["count"]
         time.sleep(1)
     return extracted_data
+
 
 def parse_args():
     """
     This function parses arguments
     """
 
-    parser = argparse.ArgumentParser(description="Get preprint data via biorxiv api from biorxiv and medrxiv")
-    parser.add_argument("--server", type=str, help="preprint server to get sitemap tags for")
-    parser.add_argument("--start_date", type=str, help="start date in format YYYY-MM-DD")
+    parser = argparse.ArgumentParser(
+        description="Get preprint data via biorxiv api from biorxiv and medrxiv"
+    )
+    parser.add_argument(
+        "--server", type=str, help="preprint server to get sitemap tags for"
+    )
+    parser.add_argument(
+        "--start_date", type=str, help="start date in format YYYY-MM-DD"
+    )
     parser.add_argument("--end_date", type=str, help="end date in format YYYY-MM-DD")
-    parser.add_argument("--filename", type=str, help="name of json file to save data to")
+    parser.add_argument(
+        "--filename", type=str, help="name of json file to save data to"
+    )
     args = parser.parse_args()
 
     return args
+
 
 def main():
     args = parse_args()
@@ -60,4 +69,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
