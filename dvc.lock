@@ -1,0 +1,104 @@
+schema: '2.0'
+stages:
+  get_preprint_data_biorxiv:
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date
+      2022-01-10 --filename "extracted_biorxiv.json" --server "biorxiv"
+    deps:
+    - path: preprint_revisions/get_preprint_data.py
+      md5: 6665e04d33d8dc816d975054fceb9eab
+      size: 2001
+    outs:
+    - path: data/extracted_biorxiv.json
+      md5: 3c37e270bba9913d9c1a46b63653f064
+      size: 1157659
+  get_urls_biorxiv:
+    cmd: python preprint_revisions/get_sitemaps.py --server biorxiv
+    outs:
+    - path: data/biorxiv_urls.json
+      md5: 42c425a853f7920dc7fd3a17b2575d5f
+      size: 14207942
+  get_revisions_biorxiv:
+    cmd: python preprint_revisions/get_revisions.py --server "biorxiv"
+    deps:
+    - path: data/biorxiv_urls.json
+      md5: 42c425a853f7920dc7fd3a17b2575d5f
+      size: 14207942
+    - path: data/extracted_biorxiv.json
+      md5: 3c37e270bba9913d9c1a46b63653f064
+      size: 1157659
+    - path: preprint_revisions/get_revisions.py
+      md5: 6f54f16a50b39ca57e23ca9c24757489
+      size: 3103
+    outs:
+    - path: data/revision_dict_biorxiv.json
+      md5: 99914b932bd37a50b983c5e7c90ae93b
+      size: 2
+  get_preprint_data_medrxiv:
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date
+      2022-01-10 --filename "extracted_medrxiv.json" --server "medrxiv"
+    deps:
+    - path: preprint_revisions/get_preprint_data.py
+      md5: 6665e04d33d8dc816d975054fceb9eab
+      size: 2001
+    outs:
+    - path: data/extracted_medrxiv.json
+      md5: 2d7af7abe760754f1873ffa0ef303bd7
+      size: 528568
+  get_urls_medrxiv:
+    cmd: python preprint_revisions/get_sitemaps.py --server medrxiv
+    deps:
+    - path: preprint_revisions/get_sitemaps.py
+      md5: c944505a3954603a1441a84cc9294332
+      size: 1968
+    outs:
+    - path: data/medrxiv_urls.json
+      md5: 6fb45a964bf2928c5251521ceaa5e583
+      size: 3038920
+  get_revisions_medrxiv:
+    cmd: python preprint_revisions/get_revisions.py --server "medrxiv"
+    deps:
+    - path: data/extracted_medrxiv.json
+      md5: 2d7af7abe760754f1873ffa0ef303bd7
+      size: 528568
+    - path: data/medrxiv_urls.json
+      md5: 6fb45a964bf2928c5251521ceaa5e583
+      size: 3038920
+    - path: preprint_revisions/get_revisions.py
+      md5: 6f54f16a50b39ca57e23ca9c24757489
+      size: 3103
+    outs:
+    - path: data/revision_dict_medrxiv.json
+      md5: f703d12396a68c99c8e2926ddd4d6047
+      size: 8296
+  cluster_medrxiv:
+    cmd: python preprint_revisions/cluster.py --server "medrxiv"
+    deps:
+    - path: data/revision_dict_medrxiv.json
+      md5: f703d12396a68c99c8e2926ddd4d6047
+      size: 8296
+    - path: preprint_revisions/cluster.py
+      md5: a25823d9ae058bec829ac5ec83dc8b7a
+      size: 6007
+    outs:
+    - path: data/cluster_dict_medrxiv.json
+      md5: 2068525ffa565a94c23c16878113e94b
+      size: 2199
+    - path: data/clusters_medrxiv.png
+      md5: 9b01fb12035d22cca60613fbab8ffdfd
+      size: 12284
+  cluster_biorxiv:
+    cmd: python preprint_revisions/cluster.py --server "biorxiv"
+    deps:
+    - path: data/revision_dict_biorxiv.json
+      md5: 99914b932bd37a50b983c5e7c90ae93b
+      size: 2
+    - path: preprint_revisions/cluster.py
+      md5: a25823d9ae058bec829ac5ec83dc8b7a
+      size: 6007
+    outs:
+    - path: data/cluster_dict_biorxiv.json
+      md5: 41b3699fe1322a0b958ce052b6b61f7d
+      size: 41
+    - path: data/clusters_biorxiv.png
+      md5: 4738d297c0a6787bc3b9718a11da0b27
+      size: 2396

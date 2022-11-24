@@ -1,0 +1,62 @@
+stages:
+  get_urls_medrxiv:
+    cmd: python preprint_revisions/get_sitemaps.py --server medrxiv
+    deps:
+    - preprint_revisions/get_sitemaps.py
+    outs:
+    - data/medrxiv_urls.json
+
+  get_urls_biorxiv:
+    cmd: python preprint_revisions/get_sitemaps.py --server biorxiv
+    outs:
+    - data/biorxiv_urls.json
+
+  get_preprint_data_medrxiv:
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date 2022-01-10 --filename "extracted_medrxiv.json" --server "medrxiv"
+    deps:
+    - preprint_revisions/get_preprint_data.py
+    outs:
+    - data/extracted_medrxiv.json
+
+  get_preprint_data_biorxiv:
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date 2022-01-10 --filename "extracted_biorxiv.json" --server "biorxiv"
+    deps:
+    - preprint_revisions/get_preprint_data.py
+    outs:
+    - data/extracted_biorxiv.json
+    
+  get_revisions_medrxiv:
+    cmd: python preprint_revisions/get_revisions.py --server "medrxiv"
+    deps: 
+    - preprint_revisions/get_revisions.py
+    - data/extracted_medrxiv.json
+    - data/medrxiv_urls.json
+    outs:
+    - data/revision_dict_medrxiv.json
+
+  get_revisions_biorxiv:
+    cmd: python preprint_revisions/get_revisions.py --server "biorxiv"
+    deps: 
+    - preprint_revisions/get_revisions.py
+    - data/extracted_biorxiv.json
+    - data/biorxiv_urls.json
+    outs:
+    - data/revision_dict_biorxiv.json
+
+  cluster_medrxiv:
+    cmd: python preprint_revisions/cluster.py --server "medrxiv"
+    deps:
+    - preprint_revisions/cluster.py
+    - data/revision_dict_medrxiv.json
+    outs:
+    - data/clusters_medrxiv.png
+    - data/cluster_dict_medrxiv.json
+
+  cluster_biorxiv:
+    cmd: python preprint_revisions/cluster.py --server "biorxiv"
+    deps:
+    - preprint_revisions/cluster.py
+    - data/revision_dict_biorxiv.json
+    outs:
+    - data/clusters_biorxiv.png
+    - data/cluster_dict_biorxiv.json
