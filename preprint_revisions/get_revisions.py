@@ -7,33 +7,35 @@ from tqdm import tqdm
 from util.json_loader import load_json, save_to_json
 from util.config import DATA_DIR
 
-
-def get_dois(data):
+def get_versions(server):
     """
-    Extracts all DOIs from a JSON file.
+    This function takes a server and returns a dictionary of all preprint dois and their versions
+    Args:
+        server (str): server to make API call to
+    Returns:
+        versions_dict (dict): dictionary of all preprint dois and their versions
     """
-    dois = []
-    for preprint in data:
-        dois.append(preprint["preprint_doi"])
-    return dois
+    data = load_json(f"{DATA_DIR}/extracted_{server}.json")
 
+    versions_dict = {}
 
-def get_urls(data):
-    """
-    Extracts all URLs from a JSON file.
-    """
-    urls = []
-    for key, value in data.items():
-        for url in value:
+    for d in data:
+        if d["doi"] in versions_dict.keys():
+            if "version" in d.keys():
+                if int(d["version"]) > versions_dict[d["doi"]]:
+                    versions_dict[d["doi"]] = int(d["version"])
+        else:
+            if "version" in d.keys():
+                versions_dict[d["doi"]] = int(d["version"])
+            else:
+                versions_dict[d["doi"]] = "Missing"
 
-            # regex to catch anything that looks like "http://www.medrxiv.org/content/10.1101/2020.04.09.20059790v4"
-            if re.match(
-                r"^https?:\/\/(?:www\.)?(?:medrxiv|biorxiv|arxiv)\.org\/content\/10\.1101\/\d{4}\.\d{2}\.\d{2}\.\d{8}v\d{1,2}$",
-                url,
-            ):
-                urls.append(url)
-    return urls
+    # drop any key, value pairs from versions_dict that have only 1 version or are missing versions
+    versions_dict = {
+        k: v for k, v in versions_dict.items() if v != 1 and v != "Missing"
+    }
 
+    return versions_dict
 
 def parse_args():
     """
