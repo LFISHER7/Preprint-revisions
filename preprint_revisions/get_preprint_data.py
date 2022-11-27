@@ -19,7 +19,7 @@ def get_data(server, start_date, end_date):
         extracted_data (list): list of dictionaries
     """
 
-    preprint_url = f"https://api.biorxiv.org/pubs/{server}/{start_date}/{end_date}"
+    preprint_url = f"https://api.biorxiv.org/details/{server}/{start_date}/{end_date}"
     extracted_data = []
     page = 1
     item = 0
