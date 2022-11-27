@@ -37,21 +37,21 @@ def get_versions(server):
 
     return versions_dict
 
-def parse_args():
+def build_urls(version_dict):
     """
-    This function parses arguments
+    Builds urls from the version dictionary
+    args:
+        version_dict (dict): dictionary of versions
+    returns:
+        urls (list): list of urls
     """
-
-    parser = argparse.ArgumentParser(
-        description="Get sitemap tags from biorxiv and medrxiv"
-    )
-    parser.add_argument(
-        "--server", type=str, help="preprint server to get sitemap tags for"
-    )
-    args = parser.parse_args()
-
-    return args
-
+    urls = []
+    for key, value in version_dict.items():
+        for version in range(1, value + 1):
+            urls.append(
+                f"https://www.medrxiv.org/content/{key}v{version}"
+            )
+    return urls
 
 def get_revision_text(url):
     """
