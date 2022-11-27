@@ -6,6 +6,8 @@ import time
 from tqdm import tqdm
 from util.json_loader import load_json, save_to_json
 from util.config import DATA_DIR
+from datetime import datetime
+
 
 def get_versions(server):
     """
@@ -37,6 +39,7 @@ def get_versions(server):
 
     return versions_dict
 
+
 def build_urls(version_dict):
     """
     Builds urls from the version dictionary
@@ -48,10 +51,9 @@ def build_urls(version_dict):
     urls = []
     for key, value in version_dict.items():
         for version in range(1, value + 1):
-            urls.append(
-                f"https://www.medrxiv.org/content/{key}v{version}"
-            )
+            urls.append(f"https://www.medrxiv.org/content/{key}v{version}")
     return urls
+
 
 def get_revision_text(url):
     """
@@ -61,8 +63,8 @@ def get_revision_text(url):
     returns:
         revision_text (str): the revision text
     """
-
-    page = requests.get(url)
+    
+    page = requests.get(url + ".article-info")
     soup = BeautifulSoup(page.content, "html.parser")
     header = soup.find("li", class_="fn-group-summary-of-updates")
 
@@ -70,9 +72,20 @@ def get_revision_text(url):
         revision_text = header.find("p").text
     else:
         revision_text = None
+   
+    revision_time = soup.find("div", id="highwire-versions-wrapper").find(class_="hw-version-previous-no-link")
+   
+    # find li element that is parent of revisions times and get "date" attribute
+    revision_time = int(revision_time.find_parent("li")["date"])
+    
+    # convert revision time to datetime object
+    revision_time = datetime.fromtimestamp(revision_time).strftime("%Y-%m-%d %H:%M:%S")
+    
     time.sleep(1)
+    
 
-    return revision_text
+    return revision_text, revision_time
+
 
 def parse_args():
     """
@@ -100,7 +113,7 @@ def main():
     versions_dict = get_versions(server)
 
     urls = build_urls(versions_dict)
-    
+
     text_dict = {}
     print("Extracting revision text...")
 
