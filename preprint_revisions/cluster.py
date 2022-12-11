@@ -198,11 +198,11 @@ def main():
     revision_texts = [preprocess(text) for text in revision_texts if text]
 
     if len(revision_texts) > 10:
-        print(revision_texts)
+
         tfidf_matrix, feature_names = get_tfidf_matrix(revision_texts)
         labels = cluster_kmeans(tfidf_matrix, feature_names, 10)
         pca_transformed = pca_transform(tfidf_matrix, 2)
-        print(f"{DATA_DIR}/clusters_{server}.png")
+
         plot_clusters(pca_transformed, labels, f"{DATA_DIR}/clusters_{server}.png")
         save_text_clusters(
             revision_texts, labels, f"{DATA_DIR}/cluster_dict_{server}.json"

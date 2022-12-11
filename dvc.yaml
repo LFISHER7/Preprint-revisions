@@ -31,6 +31,54 @@ stages:
     outs:
     - data/revision_dict_biorxiv.json
 
+  get_revision_times_medrxiv:
+    cmd: python preprint_revisions/revision_time.py --server "medrxiv"
+    deps: 
+    - preprint_revisions/revision_time.py
+    - data/extracted_medrxiv.json
+    outs:
+    - results/proportion_revisions_medrxiv.png
+    - results/revisions_over_time_medrxiv.png
+    - results/revision_times_medrxiv.png
+    - results/number_of_revisions_medrxiv.png
+    - results/revision_times_medrxiv_most_revised.png
+    - results/revision_traces_medrxiv.json
+
+  get_revision_times_biorxiv:
+    cmd: python preprint_revisions/revision_time.py --server "biorxiv"
+    deps: 
+    - preprint_revisions/revision_time.py
+    - data/extracted_biorxiv.json
+    outs:
+    - results/proportion_revisions_biorxiv.png
+    - results/revisions_over_time_biorxiv.png
+    - results/revision_times_biorxiv.png
+    - results/number_of_revisions_biorxiv.png
+    - results/revision_times_biorxiv_most_revised.png
+    - results/revision_traces_biorxiv.json
+
+  get_revision_stats_medrxiv:
+    cmd: python preprint_revisions/revision_text_statistics.py --server "medrxiv"
+    deps: 
+    - preprint_revisions/revision_text_statistics.py
+    - data/revision_dict_medrxiv.json
+    - data/extracted_medrxiv.json
+    outs:
+    - results/proportion_revisions_with_text_medrxiv.png
+    - results/revision_text_statistics_medrxiv.png
+    - data/merged_df_medrxiv.csv
+
+  get_revision_stats_biorxiv:
+    cmd: python preprint_revisions/revision_text_statistics.py --server "biorxiv"
+    deps: 
+    - preprint_revisions/revision_text_statistics.py
+    - data/revision_dict_biorxiv.json
+    - data/extracted_biorxiv.json
+    outs:
+    - results/proportion_revisions_with_text_biorxiv.png
+    - results/revision_text_statistics_biorxiv.png
+    - data/merged_df_biorxiv.csv
+
   cluster_medrxiv:
     cmd: python preprint_revisions/cluster.py --server "medrxiv"
     deps:
