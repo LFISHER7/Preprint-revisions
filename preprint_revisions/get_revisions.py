@@ -19,6 +19,9 @@ def get_versions(server):
     """
     data = load_json(f"{DATA_DIR}/extracted_{server}.json")
 
+    # order data based on "date"
+    data = sorted(data, key=lambda k: k["date"])
+    
     versions_dict = {}
 
     for d in data:
@@ -64,27 +67,41 @@ def get_revision_text(url):
         revision_text (str): the revision text
     """
     
-    page = requests.get(url + ".article-info")
-    soup = BeautifulSoup(page.content, "html.parser")
-    header = soup.find("li", class_="fn-group-summary-of-updates")
-
-    if header:
-        revision_text = header.find("p").text
+    page_revision_text = requests.get(url)
+    soup_revision_text = BeautifulSoup(page_revision_text.content, "html.parser")
+    revision_text_header = soup_revision_text.find("li", class_="fn-group-summary-of-updates")
+    
+    if revision_text_header:
+        revision_text = revision_text_header.find("p").text
     else:
         revision_text = None
-   
-    revision_time = soup.find("div", id="highwire-versions-wrapper").find(class_="hw-version-previous-no-link")
-   
-    # find li element that is parent of revisions times and get "date" attribute
-    revision_time = int(revision_time.find_parent("li")["date"])
     
-    # convert revision time to datetime object
-    revision_time = datetime.fromtimestamp(revision_time).strftime("%Y-%m-%d %H:%M:%S")
+    # page_revision_time = requests.get(url)
+    # soup_revision_time = BeautifulSoup(page_revision_time.content, "html.parser")
+    # revisions_section = soup_revision_time.find("div", id="highwire-versions-wrapper")
+  
+    # if revisions_section:
+    #     revision_time = revisions_section.find(class_="hw-version-previous-no-link")
+    #     # find li element that is parent of revisions times and get "date" attribute
+        
+    #     if revision_time:
+
+    #         revision_time = int(revision_time.find_parent("li")["date"])
+        
+    #         # convert revision time to datetime object
+    #         revision_time = datetime.fromtimestamp(revision_time).strftime("%Y-%m-%d %H:%M:%S")
+    #     else:
+    #         # if this doesn't exist, it's becuase this is the latest version - we can get this later
+    #         revision_time = None
+    # else:
+    #     revision_time = None
+   
     
-    time.sleep(1)
+    
+    time.sleep(0.5)
     
 
-    return revision_text, revision_time
+    return revision_text
 
 
 def parse_args():
@@ -114,8 +131,11 @@ def main():
 
     urls = build_urls(versions_dict)
 
+    # reverse urls
+    urls = urls[::-1]
     text_dict = {}
     print("Extracting revision text...")
+
 
     for url in tqdm(urls):
         # exclude urls that are the first version of the preprint
