@@ -57,6 +57,26 @@ stages:
     - data/revision_times_medrxiv_most_revised.png
     - data/revision_traces_medrxiv.json
 
+  get_revision_stats_medrxiv:
+    cmd: python preprint_revisions/revision_text_statistics.py --server "medrxiv"
+    deps: 
+    - preprint_revisions/revision_text_statistics.py
+    - data/revision_dict_medrxiv.json
+    - data/extracted_medrxiv.json
+    outs:
+    - data/proportion_revisions_with_text_medrxiv.png
+    - data/revision_text_statistics_medrxiv.png
+
+  get_revision_stats_biorxiv:
+    cmd: python preprint_revisions/revision_text_statistics.py --server "biorxiv"
+    deps: 
+    - preprint_revisions/revision_text_statistics.py
+    - data/revision_dict_biorxiv.json
+    - data/extracted_biorxiv.json
+    outs:
+    - data/proportion_revisions_with_text_biorxiv.png
+    - data/revision_text_statistics_biorxiv.png
+
   cluster_medrxiv:
     cmd: python preprint_revisions/cluster.py --server "medrxiv"
     deps:
