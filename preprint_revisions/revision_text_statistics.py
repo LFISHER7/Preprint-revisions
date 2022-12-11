@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 from util import json_loader
-from util.config import DATA_DIR
+from util.config import DATA_DIR, RESULTS_DIR
 
 def parse_args():
     """
@@ -72,7 +72,7 @@ def main():
     
 
     plt.title("Proportion of revisions with text")
-    plt.savefig(f"{DATA_DIR}/proportion_revisions_with_text_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/proportion_revisions_with_text_{args.server}.png")
 
 
     # plot distribution of number of words
@@ -80,7 +80,7 @@ def main():
     plt.xlabel("Number of words")
     plt.ylabel("Number of revisions")
     plt.title(f"Distribution of number of words per revision for {args.server}")
-    plt.savefig(f"{DATA_DIR}/revision_text_statistics_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/revision_text_statistics_{args.server}.png")
 
 if __name__ == "__main__":
     main()

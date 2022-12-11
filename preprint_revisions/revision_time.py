@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from util.config import DATA_DIR
+from util.config import DATA_DIR, RESULTS_DIR
 from util.json_loader import load_json, save_to_json
 
 
@@ -24,6 +24,9 @@ def parse_args():
 def main():
     args = parse_args()
 
+    if not RESULTS_DIR.exists():
+        RESULTS_DIR.mkdir()
+
     data = load_json(f"{DATA_DIR}/extracted_{args.server}.json")
 
     dfs = [pd.DataFrame(d, index=[0]) for d in data]
@@ -44,7 +47,8 @@ def main():
     df.groupby("date_month")["has_revision"].mean().plot()
     plt.title("Proportion of preprints that have a revision")
     # save
-    plt.savefig(f"{DATA_DIR}/proportion_revisions_{args.server}.png")
+    print(f"{RESULTS_DIR}/proportion_revisions_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/proportion_revisions_{args.server}.png")
 
 
 
@@ -59,7 +63,7 @@ def main():
     # rotate x labels
     plt.xticks(rotation=90)
     plt.tight_layout()
-    plt.savefig(f"{DATA_DIR}/revisions_over_time_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/revisions_over_time_{args.server}.png")
     plt.clf()
 
 
@@ -108,7 +112,7 @@ def main():
     plt.title(f"Revision times for {args.server} (n={len(times_combined)})")
     plt.xlabel("Days between revisions")
     plt.ylabel("Number of revisions")
-    plt.savefig(f"{DATA_DIR}/revision_times_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/revision_times_{args.server}.png")
     plt.clf()
 
     # plot distribution of number of revisions
@@ -117,7 +121,7 @@ def main():
     plt.xlabel("Number of revisions")
     plt.ylabel("Number of preprints")
     plt.yticks([])
-    plt.savefig(f"{DATA_DIR}/number_of_revisions_{args.server}.png")
+    plt.savefig(f"{RESULTS_DIR}/number_of_revisions_{args.server}.png")
     plt.clf()
 
     # find the longest 100 lists in revision_traces
@@ -140,11 +144,11 @@ def main():
         plt.title(f"Revision times for {args.server} (n={len(most_revised)})")
         plt.xlabel("Days")
        
-    plt.savefig(f"{DATA_DIR}/revision_times_{args.server}_most_revised.png")
+    plt.savefig(f"{RESULTS_DIR}/revision_times_{args.server}_most_revised.png")
     plt.clf()
 
 
-    save_to_json(revision_traces, f"{DATA_DIR}/revision_traces_{args.server}.json")
+    save_to_json(revision_traces, f"{RESULTS_DIR}/revision_traces_{args.server}.json")
 
 
 if __name__ == "__main__":
