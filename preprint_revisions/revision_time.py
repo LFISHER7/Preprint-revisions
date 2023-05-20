@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from util.config import DATA_DIR, RESULTS_DIR
 from util.json_loader import load_json, save_to_json
-
+import re
 
 def parse_args():
     """
@@ -28,6 +28,28 @@ def main():
         RESULTS_DIR.mkdir()
 
     data = load_json(f"{DATA_DIR}/extracted_{args.server}.json")
+
+    texts = load_json(f"{DATA_DIR}/revision_dict_{args.server}.json")
+
+    revision_text_dfs = []
+    for url, text in texts.items():
+       
+        # re to get doi (10.1101/2021.04.19.21255414) from url that looks like this - 0.1101/2021.04.19.21255414v2
+        doi = re.search(r"(?<=content\/)(.*)(?=v)", url).group(0)
+        
+        # get version number from url
+        version = re.search(r"(?<=v)(.*)", url.split("/")[-1]).group(0)
+        version = int(version)
+        row_dict = {
+            "doi": doi,
+            "version": version,
+            "text": text
+        }
+        row = pd.DataFrame(row_dict, index=[0])
+        revision_text_dfs.append(row)
+    
+    revision_text = pd.concat(revision_text_dfs, axis=0)
+        
 
     dfs = [pd.DataFrame(d, index=[0]) for d in data]
     df = pd.concat(dfs)
@@ -80,6 +102,7 @@ def main():
 
     
 
+    updated_df = []
 
     # group df by doi, order rows by version and then calculate time between versions
     for doi, group in df.groupby("doi"):
@@ -98,6 +121,32 @@ def main():
 
         revision_traces[doi] = revision_times
 
+        # see if the title or abstract changed
+        group["title_changed"] = group["title"].ne(group["title"].shift())
+
+        group["abstract_changed"] = group["abstract"].ne(group["abstract"].shift())
+
+        # see if the author list changed
+        group["authors_changed"] = group["authors"].ne(group["authors"].shift())
+
+        # for the first row, set all of these to NA
+        group.loc[group["version"] == 1, ["title_changed", "abstract_changed", "authors_changed"]] = None
+
+        group = group.merge(revision_text[["doi", "version", "text"]], on=["doi", "version"], how="left")
+        group.rename(columns={"text": "revision_text"}, inplace=True)
+
+        updated_df.append(group)
+    
+    updated_df = pd.concat(updated_df)
+
+    # print the proportion of revisions that change the title, abstract or authors (dont include first version)
+    print(f"Proportion of revisions that change title: {updated_df[updated_df['version'] > 1]['title_changed'].mean()}")
+    print(f"Proportion of revisions that change abstract: {updated_df[updated_df['version'] > 1]['abstract_changed'].mean()}")
+    print(f"Proportion of revisions that change authors: {updated_df[updated_df['version'] > 1]['authors_changed'].mean()}")
+
+    print(f"Number of revisions: {updated_df.shape[0]}")
+    print(f"Number of revisions with text: {updated_df['revision_text'].notnull().sum()}")
+    updated_df.to_csv(f"{RESULTS_DIR}/revision_stats_{args.server}.csv", index=False)
     times_combined = [time for doi, times in revision_traces.items() for time in times]
 
     # summary stats for times_combined
