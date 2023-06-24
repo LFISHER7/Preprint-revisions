@@ -4,3 +4,7 @@ setup:
 
 clean:
 	rm -f data/*
+
+
+test:
+    PYTHONPATH=preprint_revisions python -m pytest
