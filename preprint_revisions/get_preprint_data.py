@@ -1,13 +1,12 @@
-import requests
-import time
 import argparse
-from util.json_loader import save_to_json
-from util.config import DATA_DIR
+import time
 
-# make call to medrxiv API and fetch all preprints
+import requests
+
+from .util.config import DATA_DIR
+from .util.json_loader import save_to_json
 
 
-# turn while loop into a function
 def get_data(server, start_date, end_date):
     """
     This function takes a url, start date, and end date and returns a list of dictionaries
