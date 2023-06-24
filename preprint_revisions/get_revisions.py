@@ -4,9 +4,8 @@ import time
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-
-from .util.config import DATA_DIR
-from .util.json_loader import load_json, save_to_json
+from util.config import DATA_DIR
+from util.json_loader import load_json, save_to_json
 
 
 def get_versions(server):

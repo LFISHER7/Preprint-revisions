@@ -2,9 +2,8 @@ import argparse
 import time
 
 import requests
-
-from .util.config import DATA_DIR
-from .util.json_loader import save_to_json
+from util.config import DATA_DIR
+from util.json_loader import save_to_json
 
 
 def get_data(server, start_date, end_date):
