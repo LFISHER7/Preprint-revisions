@@ -8,15 +8,15 @@ from util.config import DATA_DIR
 from util.json_loader import load_json, save_to_json
 
 
-def get_versions(server):
+def get_versions(data_file):
     """
     This function takes a server and returns a dictionary of all preprint dois and their versions
     Args:
-        server (str): server to make API call to
+        data_file (str): data file to load - contains extracted preprint data
     Returns:
         versions_dict (dict): dictionary of all preprint dois and their versions
     """
-    data = load_json(f"{DATA_DIR}/extracted_{server}.json")
+    data = load_json(f"{DATA_DIR}/{data_file}")
 
     # order data based on "date"
     data = sorted(data, key=lambda k: k["date"])
@@ -45,10 +45,10 @@ def get_versions(server):
 
 def build_urls(version_dict):
     """
-    Builds urls from the version dictionary
-    args:
-        version_dict (dict): dictionary of versions
-    returns:
+    Builds urls for each version of each preprint from the version dictionary
+    Args:
+        version_dict (dict): dictionary where the key is the doi and the value is the number of versions
+    Returns:
         urls (list): list of urls
     """
     urls = []
@@ -60,10 +60,10 @@ def build_urls(version_dict):
 
 def get_revision_text(url):
     """
-    Gets the revision text from the provided url
-    args:
+    You can't get the revision text using the api, so scrape it from the provided url.
+    Args:
         url (str): url of the revision
-    returns:
+    Returns:
         revision_text (str): the revision text
     """
 
@@ -84,15 +84,15 @@ def get_revision_text(url):
 
 
 def parse_args():
-    """
-    This function parses arguments
-    """
 
     parser = argparse.ArgumentParser(
-        description="Get sitemap tags from biorxiv and medrxiv"
+        description="Get revision text associated with each updated version of a preprint"
     )
     parser.add_argument(
-        "--server", type=str, help="preprint server to get sitemap tags for"
+        "--preprint-data-file",
+        type=str,
+        help="file containing preprint data",
+        required=True,
     )
     args = parser.parse_args()
 
@@ -104,14 +104,13 @@ def main():
     For all dois in extracted data, find all relevant urls
     """
     args = parse_args()
-    server = args.server
+    data_file = args.preprint_data_file
 
-    versions_dict = get_versions(server)
+    versions_dict = get_versions(data_file)
 
     urls = build_urls(versions_dict)
-
-    # reverse urls
     urls = urls[::-1]
+
     text_dict = {}
     print("Extracting revision text...")
 
@@ -119,6 +118,11 @@ def main():
         # exclude urls that are the first version of the preprint
         if not url.endswith("v1"):
             text_dict[url] = get_revision_text(url)
+
+    if "medrxiv" in data_file:
+        server = "medrxiv"
+    else:
+        server = "biorxiv"
 
     save_to_json(text_dict, f"{DATA_DIR}/revision_dict_{server}.json")
 

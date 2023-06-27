@@ -55,7 +55,7 @@ stages:
       md5: 6fb45a964bf2928c5251521ceaa5e583
       size: 3038920
   get_revisions_medrxiv:
-    cmd: python preprint_revisions/get_revisions.py --data-file "extracted_medrxiv.json"
+    cmd: python preprint_revisions/get_revisions.py --preprint-data-file "extracted_medrxiv.json"
     deps:
     - path: data/extracted_medrxiv.json
       md5: 01a07e46120c4784be4dc7e5ef7357e1
@@ -64,8 +64,8 @@ stages:
       md5: 94787d8c7dd57019b2bb9a3cd854d58f
       size: 3040584
     - path: preprint_revisions/get_revisions.py
-      md5: 7e0677c88aa78f11e3f7d54c8a2a0490
-      size: 3654
+      md5: 4e234ee3670935e66cd10b1aec0ff913
+      size: 3669
     outs:
     - path: data/revision_dict_medrxiv.json
       md5: f90ca018deb60aa718d3695a9a2c5a6c
@@ -153,3 +153,20 @@ stages:
     - path: results/revisions_over_time_medrxiv.png
       md5: bbcfb1badea6d29cafbcc2d50cf9f08b
       size: 19194
+  process_data_medrxiv:
+    cmd: python preprint_revisions/process_data.py --preprint-data-file "extracted_medrxiv.json"
+      --revision-data-file "revision_dict_medrxiv.json"
+    deps:
+    - path: data/extracted_medrxiv.json
+      md5: 01a07e46120c4784be4dc7e5ef7357e1
+      size: 3577826
+    - path: data/revision_dict_medrxiv.json
+      md5: f90ca018deb60aa718d3695a9a2c5a6c
+      size: 72476
+    - path: preprint_revisions/get_revisions.py
+      md5: 4e234ee3670935e66cd10b1aec0ff913
+      size: 3669
+    outs:
+    - path: data/preprint_revision_df_medrxiv.csv
+      md5: 3ecd30fb74ad9ff91ad1a5b11f82f59b
+      size: 3321417

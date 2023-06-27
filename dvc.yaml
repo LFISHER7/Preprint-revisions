@@ -7,7 +7,7 @@ stages:
     - data/extracted_medrxiv.json
 
   get_revisions_medrxiv:
-    cmd: python preprint_revisions/get_revisions.py --server "medrxiv"
+    cmd: python preprint_revisions/get_revisions.py --preprint-data-file "extracted_medrxiv.json"
     deps:
     - preprint_revisions/get_revisions.py
     - data/extracted_medrxiv.json
