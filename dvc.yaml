@@ -16,7 +16,7 @@ stages:
     - data/revision_dict_medrxiv.json
 
   get_revision_times_medrxiv:
-    cmd: python preprint_revisions/revision_time.py --server "medrxiv"
+    cmd: python preprint_revisions/revision_time.py --preprint-data-file "extracted_medrxiv.json" --revision-data-file "revision_dict_medrxiv.json"
     deps:
     - preprint_revisions/revision_time.py
     - data/extracted_medrxiv.json
