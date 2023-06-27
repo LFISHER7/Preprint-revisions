@@ -36,16 +36,11 @@ def get_data(server, start_date, end_date):
 
 
 def parse_args():
-    """
-    This function parses arguments
-    """
 
     parser = argparse.ArgumentParser(
         description="Get preprint data via biorxiv api from biorxiv and medrxiv"
     )
-    parser.add_argument(
-        "--server", type=str, help="preprint server to get sitemap tags for"
-    )
+    parser.add_argument("--server", type=str, help="preprint server to data for")
     parser.add_argument(
         "--start_date", type=str, help="start date in format YYYY-MM-DD"
     )

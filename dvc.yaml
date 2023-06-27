@@ -1,6 +1,6 @@
 stages:
   get_preprint_data_medrxiv:
-    cmd: python preprint_revisions/get_preprint_data.py --start_date 2020-01-01 --end_date 2022-10-31 --filename "extracted_medrxiv.json" --server "medrxiv"
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date 2022-02-01 --filename "extracted_medrxiv.json" --server "medrxiv"
     deps:
     - preprint_revisions/get_preprint_data.py
     outs:
