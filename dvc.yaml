@@ -15,12 +15,14 @@ stages:
     outs:
     - data/revision_dict_medrxiv.json
 
-  get_revision_times_medrxiv:
-    cmd: python preprint_revisions/revision_time.py --preprint-data-file "extracted_medrxiv.json" --revision-data-file "revision_dict_medrxiv.json"
+  process_data_medrxiv:
+    cmd: python preprint_revisions/process_data.py --preprint-data-file "extracted_medrxiv.json" --revision-data-file "revision_dict_medrxiv.json"
     deps:
-    - preprint_revisions/revision_time.py
+    - preprint_revisions/get_revisions.py
+    - data/revision_dict_medrxiv.json
     - data/extracted_medrxiv.json
     outs:
+    - data/preprint_revision_df_medrxiv.csv
     - results/proportion_revisions_medrxiv.png
     - results/revisions_over_time_medrxiv.png
     - results/revision_times_medrxiv.png
