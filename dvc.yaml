@@ -23,6 +23,13 @@ stages:
     - data/extracted_medrxiv.json
     outs:
     - data/preprint_revision_df_medrxiv.csv
+
+  get_revision_statistics_medrxiv:
+    cmd: python preprint_revisions/generate_revision_statistics.py --data-file "preprint_revision_df_medrxiv.csv"
+    deps:
+    - preprint_revisions/generate_revision_statistics.py
+    - data/preprint_revision_df_medrxiv.csv
+    outs:
     - results/proportion_revisions_medrxiv.png
     - results/revisions_over_time_medrxiv.png
     - results/revision_times_medrxiv.png
