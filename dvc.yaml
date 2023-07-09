@@ -1,13 +1,13 @@
 stages:
   get_preprint_data_medrxiv:
-    cmd: python preprint_revisions/get_preprint_data.py --start_date 2020-01-01 --end_date 2022-10-31 --filename "extracted_medrxiv.json" --server "medrxiv"
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2019-01-01 --end_date 2023-01-01 --filename "extracted_medrxiv.json" --server "medrxiv"
     deps:
     - preprint_revisions/get_preprint_data.py
     outs:
     - data/extracted_medrxiv.json
 
   get_revisions_medrxiv:
-    cmd: python preprint_revisions/get_revisions.py --server "medrxiv"
+    cmd: python preprint_revisions/get_revisions.py --preprint-data-file "extracted_medrxiv.json"
     deps:
     - preprint_revisions/get_revisions.py
     - data/extracted_medrxiv.json
@@ -15,29 +15,32 @@ stages:
     outs:
     - data/revision_dict_medrxiv.json
 
-  get_revision_times_medrxiv:
-    cmd: python preprint_revisions/revision_time.py --server "medrxiv"
+  process_data_medrxiv:
+    cmd: python preprint_revisions/process_data.py --preprint-data-file "extracted_medrxiv.json" --revision-data-file "revision_dict_medrxiv.json"
     deps:
-    - preprint_revisions/revision_time.py
-    - data/extracted_medrxiv.json
-    outs:
-    - results/proportion_revisions_medrxiv.png
-    - results/revisions_over_time_medrxiv.png
-    - results/revision_times_medrxiv.png
-    - results/number_of_revisions_medrxiv.png
-    - results/revision_times_medrxiv_most_revised.png
-    - results/revision_traces_medrxiv.json
-
-  get_revision_stats_medrxiv:
-    cmd: python preprint_revisions/revision_text_statistics.py --server "medrxiv"
-    deps:
-    - preprint_revisions/revision_text_statistics.py
+    - preprint_revisions/get_revisions.py
     - data/revision_dict_medrxiv.json
     - data/extracted_medrxiv.json
     outs:
-    - results/proportion_revisions_with_text_medrxiv.png
-    - results/revision_text_statistics_medrxiv.png
-    - data/merged_df_medrxiv.csv
+    - data/preprint_revision_df_medrxiv.csv
+
+  get_revision_statistics_medrxiv:
+    cmd: python preprint_revisions/generate_revision_statistics.py --data-file "preprint_revision_df_medrxiv.csv"
+    deps:
+    - preprint_revisions/generate_revision_statistics.py
+    - data/preprint_revision_df_medrxiv.csv
+    outs:
+    - results/medrxiv/changes_stats.json
+    - results/medrxiv/num_versions.json
+    - results/medrxiv/preprints_over_time.png
+    - results/medrxiv/proportion_revisions.png
+    - results/medrxiv/proportion_revisions_with_text.png
+    - results/medrxiv/revision_text_length.png
+    - results/medrxiv/revision_text_stats.json
+    - results/medrxiv/revision_time_stats.json
+    - results/medrxiv/revision_times_most_revised.png
+    - results/medrxiv/revision_times.png
+    - results/medrxiv/revision_traces.json
 
   cluster_medrxiv:
     cmd: python preprint_revisions/cluster.py --server "medrxiv"
