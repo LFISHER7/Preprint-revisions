@@ -1,6 +1,6 @@
 stages:
   get_preprint_data_medrxiv:
-    cmd: python preprint_revisions/get_preprint_data.py --start_date 2022-01-01 --end_date 2022-02-01 --filename "extracted_medrxiv.json" --server "medrxiv"
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2019-01-01 --end_date 2023-01-01 --filename "extracted_medrxiv.json" --server "medrxiv"
     deps:
     - preprint_revisions/get_preprint_data.py
     outs:
@@ -30,23 +30,17 @@ stages:
     - preprint_revisions/generate_revision_statistics.py
     - data/preprint_revision_df_medrxiv.csv
     outs:
-    - results/proportion_revisions_medrxiv.png
-    - results/revisions_over_time_medrxiv.png
-    - results/revision_times_medrxiv.png
-    - results/number_of_revisions_medrxiv.png
-    - results/revision_times_medrxiv_most_revised.png
-    - results/revision_traces_medrxiv.json
-
-  get_revision_stats_medrxiv:
-    cmd: python preprint_revisions/revision_text_statistics.py --server "medrxiv"
-    deps:
-    - preprint_revisions/revision_text_statistics.py
-    - data/revision_dict_medrxiv.json
-    - data/extracted_medrxiv.json
-    outs:
-    - results/proportion_revisions_with_text_medrxiv.png
-    - results/revision_text_statistics_medrxiv.png
-    - data/merged_df_medrxiv.csv
+    - results/medrxiv/changes_stats.json
+    - results/medrxiv/num_versions.json
+    - results/medrxiv/preprints_over_time.png
+    - results/medrxiv/proportion_revisions.png
+    - results/medrxiv/proportion_revisions_with_text.png
+    - results/medrxiv/revision_text_length.png
+    - results/medrxiv/revision_text_stats.json
+    - results/medrxiv/revision_time_stats.json
+    - results/medrxiv/revision_times_most_revised.png
+    - results/medrxiv/revision_times.png
+    - results/medrxiv/revision_traces.json
 
   cluster_medrxiv:
     cmd: python preprint_revisions/cluster.py --server "medrxiv"
