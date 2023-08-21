@@ -11,9 +11,17 @@ from util.json_loader import save_to_json
 
 def drop_incomplete_revision_history(df):
     """
-    Drops DOIs for which we don't have full revision history (versions outside study period)
+    Drops DOIs for which we don't have full revision history. This includes, preprints where the
+    first version is not within the study period and preprints where the first version is within
+    12 months of the end of the study period.
     """
+    latest_date = df["date"].max()
+
+    # Drop DOIs where the first version is not within the study period
     df = df.groupby("doi").filter(lambda x: x["version"].max() == len(x))
+
+    # Drop DOIs where the first version is within 12 months of the end of the study period
+    df = df.groupby("doi").filter(lambda x: (latest_date - x["date"].min()).days > 365)
     return df
 
 
@@ -35,7 +43,7 @@ def plot_preprints_over_time(df, output_dir, figsize=(10, 5)):
     plt.ylabel("Number of preprints")
     plt.xticks(rotation=90)
 
-    plt.savefig(f"{output_dir}/preprints_over_time.png")
+    plt.savefig(f"{output_dir}/preprints_over_time.png", transparent=True)
     plt.tight_layout()
     plt.clf()
 
@@ -88,7 +96,7 @@ def plot_proportion_with_revision(df, output_dir, figsize=(10, 5)):
     plt.xlabel("Date")
     plt.xticks(rotation=90)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/proportion_revisions.png")
+    plt.savefig(f"{output_dir}/proportion_revisions.png", transparent=True)
     plt.clf()
 
     return proportion_with_revision
@@ -142,7 +150,7 @@ def plot_num_revisions_distribution(revision_traces, output_dir, bins=100):
     plt.xlabel("Number of revisions")
     plt.ylabel("Number of preprints")
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/num_revisions_distribution.png")
+    plt.savefig(f"{output_dir}/num_revisions_distribution.png", transparent=True)
     plt.clf()
 
 
@@ -188,7 +196,7 @@ def plot_revision_time_distribution(times_between, output_dir, bins=25):
     plt.xlabel("Days between revisions")
     plt.ylabel("Number of revisions")
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/revision_times.png")
+    plt.savefig(f"{output_dir}/revision_times.png", transparent=True)
     plt.clf()
 
 
@@ -260,7 +268,7 @@ def plot_revisions_with_text_over_time(df, output_dir):
     plt.title("Proportion of revisions with text")
     plt.xticks(rotation=90)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/proportion_revisions_with_text.png")
+    plt.savefig(f"{output_dir}/proportion_revisions_with_text.png", transparent=True)
     plt.clf()
 
 
@@ -311,7 +319,7 @@ def plot_most_revised_preprints(revision_traces, output_dir):
     plt.xlabel("Days since first version", fontsize=20)
 
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/revision_times_most_revised.png")
+    plt.savefig(f"{output_dir}/revision_times_most_revised.png", transparent=True)
     plt.clf()
 
 
@@ -338,7 +346,7 @@ def revision_text_stats(df, output_dir):
     plt.xlabel("Length of revision text")
     plt.xticks(fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/revision_text_length.png")
+    plt.savefig(f"{output_dir}/revision_text_length.png", transparent=True)
     plt.clf()
 
 
