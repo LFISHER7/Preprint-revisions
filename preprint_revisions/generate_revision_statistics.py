@@ -268,31 +268,6 @@ def calculate_time_between_versions(df):
     return updated_df, doi_revision_times
 
 
-def plot_num_revisions_distribution(revision_traces, output_dir, bins=100):
-    """
-    Plots the distribution of the number of revisions and saves the plot to a PNG file.
-
-    Args:
-        revision_traces (dict): A dictionary mapping DOIs to lists of revision times.
-        bins (int): The number of bins to use in the histogram.
-    Returns:
-        None
-    """
-    num_revisions = [len(times) for times in revision_traces.values()]
-    plt.figure(figsize=(10, 5))
-    sns.histplot(num_revisions, bins=bins, kde=False, color="#EF4444")
-    plt.title(f"Number of revisions (n={len(revision_traces)})")
-    plt.xlabel("Number of revisions")
-    plt.ylabel("n")
-
-    ax = plt.gca()
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    plt.tight_layout()
-    plt.savefig(f"{output_dir}/num_revisions_distribution.png", transparent=True)
-    plt.clf()
-
-
 def revision_time_stats(revision_traces, output_dir):
     """
     Computes statistics of revision times and saves the results to a JSON file.
@@ -308,6 +283,7 @@ def revision_time_stats(revision_traces, output_dir):
         for time in times
         if not np.isnan(time)
     ]
+
     stats = {
         "mean": np.mean(times_between),
         "median": np.median(sorted(times_between)),
@@ -576,8 +552,6 @@ def main():
     plot_most_revised_preprints(revision_traces, output_dir)
 
     revision_text_stats(df_dropped, output_dir)
-
-    plot_num_revisions_distribution(revision_traces, output_dir)
 
 
 if __name__ == "__main__":
