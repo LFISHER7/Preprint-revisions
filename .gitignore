@@ -4,5 +4,4 @@ data
 __pycache__
 .dvc
 .DS_Store
-results/
 .hypothesis/

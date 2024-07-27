@@ -40,4 +40,4 @@ stages:
     - results/medrxiv/revision_time_stats.json
     - results/medrxiv/revision_times_most_revised.png
     - results/medrxiv/revision_times.png
-    - results/medrxiv/revision_traces.json
+    - data/medrxiv_revision_traces.json

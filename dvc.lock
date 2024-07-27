@@ -21,8 +21,8 @@ stages:
       md5: 94787d8c7dd57019b2bb9a3cd854d58f
       size: 3040584
     - path: preprint_revisions/get_revisions.py
-      md5: 9552332b93260ff3fb29741ad161ab15
-      size: 4688
+      md5: 429972c4d4183d1fd95bbae54738174e
+      size: 4680
     outs:
     - path: data/revision_dict_medrxiv.json
       md5: 5feb745bd648e9c0723c82a4c51afeae
@@ -38,52 +38,52 @@ stages:
       md5: 5feb745bd648e9c0723c82a4c51afeae
       size: 1870802
     - path: preprint_revisions/get_revisions.py
-      md5: 9552332b93260ff3fb29741ad161ab15
-      size: 4688
+      md5: 429972c4d4183d1fd95bbae54738174e
+      size: 4680
     outs:
     - path: data/preprint_revision_df_medrxiv.csv
-      md5: e615f74a4aa8576ac737c81150553e2e
-      size: 133077794
+      md5: cd5363fd8fbf43886665cdc06ad6ce07
+      size: 133069109
   get_revision_statistics_medrxiv:
     cmd: python preprint_revisions/generate_revision_statistics.py --data-file "preprint_revision_df_medrxiv.csv"
     deps:
     - path: data/preprint_revision_df_medrxiv.csv
-      md5: e615f74a4aa8576ac737c81150553e2e
-      size: 133077794
+      md5: cd5363fd8fbf43886665cdc06ad6ce07
+      size: 133069109
     - path: preprint_revisions/generate_revision_statistics.py
-      md5: 31b5ca5deccd6e4c59b2a978257795ac
-      size: 15699
+      md5: ff3324952d6cab42137301e36de0fc0c
+      size: 19129
     outs:
+    - path: data/medrxiv_revision_traces.json
+      md5: ff4e59e6aa94720e42970ebba916dc96
+      size: 1462898
     - path: results/medrxiv/changes_stats.json
-      md5: 5af3596f219499a6778cd3def48f9c3a
-      size: 163
+      md5: 2a4dd06b777ad9ce45035b54a59d6ae2
+      size: 164
     - path: results/medrxiv/num_versions.json
-      md5: a21e0430c3324cbfc006707b4a467463
-      size: 144
+      md5: 63d060eef301efb2d562772cce75d38e
+      size: 164
     - path: results/medrxiv/preprints_over_time.png
-      md5: e1e9f4f8baa4d2b2a8abca77b312bda1
-      size: 45814
+      md5: 1d1b973edfd66172d36c0faa00024274
+      size: 47482
     - path: results/medrxiv/proportion_revisions.png
-      md5: 75dc4ce45768cb460e9f064102313f19
-      size: 42616
+      md5: 003ab5b1f67079c5d03213fce2403e48
+      size: 42404
     - path: results/medrxiv/proportion_revisions_with_text.png
-      md5: df43a029907258225044736d02acdeb5
-      size: 41284
+      md5: a2e6eacc72372cd2ec8cef5a6f0c9c5f
+      size: 41896
     - path: results/medrxiv/revision_text_length.png
-      md5: a6355c698e6dba08b06219cf1b8205b1
-      size: 32872
+      md5: 923843213812e1c5037c5ae0b1548847
+      size: 26442
     - path: results/medrxiv/revision_text_stats.json
-      md5: 73f7a6049593c16ba48bbd88d0b25e28
-      size: 44
+      md5: 75218bc84a778eca7ff6bcdf6da6a5e7
+      size: 43
     - path: results/medrxiv/revision_time_stats.json
-      md5: 9804af523d2c194213b14234f07aafe4
-      size: 71
+      md5: eca805e55f89b8e9cd797eba08571d7d
+      size: 70
     - path: results/medrxiv/revision_times.png
-      md5: 1321ed4c2fec2f92e11b8f962fffb7e6
-      size: 23173
+      md5: 1809602d172048914bd8a1a8018fefa4
+      size: 21247
     - path: results/medrxiv/revision_times_most_revised.png
-      md5: 29ac79c6780395d82e19b2e50c1508c7
-      size: 52111
-    - path: results/medrxiv/revision_traces.json
-      md5: 06464562e8c1ee66eb6df99552906a12
-      size: 1282392
+      md5: 0d57bd943c6c48755faf13ab383894e6
+      size: 55713

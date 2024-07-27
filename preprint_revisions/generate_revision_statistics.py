@@ -29,10 +29,7 @@ def drop_incomplete_revision_history(df):
     if latest_date.is_month_start:
         df = df[df["date"] != latest_date]
 
-    original_shape = df.shape[0]
-
     num_preprints = df["doi"].nunique()
-    print(f"Loaded {num_preprints} preprints")
 
     # Drop DOIs where the max version number is not the same as
     df = df.groupby("doi").filter(lambda x: x["version"].max() == len(x))
@@ -45,9 +42,6 @@ def drop_incomplete_revision_history(df):
     num_preprints_post_drop = df_dropped_end["doi"].nunique()
     print(
         f"Dropped {num_preprints - num_preprints_post_drop} preprints with incomplete revision history"
-    )
-    print(
-        f"Dropped {original_shape - df_dropped_end.shape[0]} preprint versions with incomplete revision history"
     )
     return df, df_dropped_end
 
@@ -539,7 +533,7 @@ def main():
     df_dropped, revision_traces = calculate_time_between_versions(df_dropped)
 
     times_between = revision_time_stats(revision_traces, output_dir)
-    save_to_json(revision_traces, f"{output_dir}/revision_traces.json")
+    save_to_json(revision_traces, f"{DATA_DIR}/{server}_revision_traces.json")
 
     plot_revision_time_distribution(times_between, output_dir)
 
