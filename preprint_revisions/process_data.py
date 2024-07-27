@@ -43,8 +43,23 @@ def generate_preprint_df(preprint_data):
 
     num_versions = df.groupby("doi")[["version"]].count()
     df["max_versions"] = df["doi"].map(num_versions["version"].to_dict())
-    # a preprint has a revision if it has more than one version and the version number is not the same as version in num_versions
 
+    # remove any doi where the dates of the versions are not in order. This is a problem with the data from the API
+    problematic_dois = df.groupby("doi").apply(
+        lambda x: (x.sort_values("version")["date"].diff().dt.days < 0).any(),
+        include_groups=False,
+    )
+    problematic_dois = problematic_dois[problematic_dois].index.tolist()
+
+    if len(problematic_dois) > 0:
+        print(
+            f"Some DOIs have versions where the dates are not in order: {problematic_dois}"
+        )
+
+    # Remove problematic DOIs
+    df = df[~df["doi"].isin(problematic_dois)]
+
+    # a preprint has a revision if it has more than one version and the version number is not the same as version in num_versions
     df["has_revision"] = (df["max_versions"] > 1) & (
         df["version"] != df["max_versions"]
     )
