@@ -13,21 +13,93 @@ from preprint_revisions.generate_revision_statistics import (
 def test_drop_incomplete_revision_history():
     df = pd.DataFrame(
         {
-            "doi": ["doi1", "doi1", "doi1", "doi2", "doi2", "doi3"],
-            "version": [1, 2, 3, 2, 3, 1],
+            "doi": [
+                "doi1",
+                "doi1",
+                "doi1",
+                "doi2",
+                "doi2",
+                "doi3",
+                "doi3",
+                "doi4",
+                "doi5",
+                "doi6",
+            ],
+            "date": [
+                "2019-01-01",
+                "2019-02-01",
+                "2019-03-01",
+                "2021-03-01",
+                "2021-05-01",
+                "2022-01-01",
+                "2022-02-01",
+                "2022-03-01",
+                "2023-06-30",
+                "2023-07-01",
+            ],
+            "type": [
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "WITHDRAWN",
+                "PUBLISHAHEADOFPRINT",
+                np.nan,
+            ],
+            "version": [1, 2, 3, 2, 3, 1, 2, 1, 1, 1],
         }
     )
-
-    result = drop_incomplete_revision_history(df)
+    result, result_dropped_end = drop_incomplete_revision_history(df)
     expected_result = pd.DataFrame(
         {
-            "doi": ["doi1", "doi1", "doi1", "doi3"],
-            "version": [1, 2, 3, 1],
+            "doi": ["doi1", "doi1", "doi1", "doi3", "doi3", "doi5"],
+            "date": pd.to_datetime(
+                [
+                    "2019-01-01",
+                    "2019-02-01",
+                    "2019-03-01",
+                    "2022-01-01",
+                    "2022-02-01",
+                    "2023-06-30",
+                ]
+            ),
+            "type": [
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+            ],
+            "version": [1, 2, 3, 1, 2, 1],
+        }
+    )
+    expected_result_dropped_end = pd.DataFrame(
+        {
+            "doi": ["doi1", "doi1", "doi1", "doi3", "doi3"],
+            "date": pd.to_datetime(
+                ["2019-01-01", "2019-02-01", "2019-03-01", "2022-01-01", "2022-02-01"]
+            ),
+            "type": [
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+                "PUBLISHAHEADOFPRINT",
+            ],
+            "version": [1, 2, 3, 1, 2],
         }
     )
 
     pd.testing.assert_frame_equal(
         result.reset_index(drop=True), expected_result.reset_index(drop=True)
+    )
+    pd.testing.assert_frame_equal(
+        result_dropped_end.reset_index(drop=True),
+        expected_result_dropped_end.reset_index(drop=True),
     )
 
 

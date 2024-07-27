@@ -78,13 +78,28 @@ def get_revision_text(url):
     else:
         revision_text = None
 
-    time.sleep(0.5)
+    time.sleep(0.4)
 
     return revision_text
 
 
-def parse_args():
+def save_progress(text_dict, server, temp=False):
+    """
+    Save the current progress to a JSON file.
+    Args:
+        text_dict (dict): Dictionary containing the revision texts.
+        server (str): The server name (medrxiv or biorxiv).
+        temp (bool): Whether to save to the temp file or the final file. DVC
+            removes expected outputs if they exist, so we save to a file
+            not specified in the stage outs.
+    """
+    if temp:
+        save_to_json(text_dict, f"{DATA_DIR}/revision_dict_{server}_temp.json")
+    else:
+        save_to_json(text_dict, f"{DATA_DIR}/revision_dict_{server}.json")
 
+
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Get revision text associated with each updated version of a preprint"
     )
@@ -114,17 +129,27 @@ def main():
     text_dict = {}
     print("Extracting revision text...")
 
-    for url in tqdm(urls):
-        # exclude urls that are the first version of the preprint
-        if not url.endswith("v1"):
-            text_dict[url] = get_revision_text(url)
-
     if "medrxiv" in data_file:
         server = "medrxiv"
     else:
         server = "biorxiv"
 
-    save_to_json(text_dict, f"{DATA_DIR}/revision_dict_{server}.json")
+    try:
+        existing_data = load_json(f"{DATA_DIR}/revision_dict_{server}_temp.json")
+        text_dict.update(existing_data)
+        print(f"Loaded existing data: {len(existing_data)}")
+    except FileNotFoundError:
+        pass
+
+    for idx, url in enumerate(tqdm(urls)):
+        # exclude urls that are the first version of the preprint
+        if not url.endswith("v1"):
+            if url not in text_dict:
+                text_dict[url] = get_revision_text(url)
+                if idx % 10 == 0:  # Save progress every 10 URLs
+                    save_progress(text_dict, server, temp=True)
+
+    save_progress(text_dict, server)
 
 
 if __name__ == "__main__":
