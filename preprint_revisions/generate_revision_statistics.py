@@ -174,9 +174,6 @@ def num_versions_distribution(df, output_dir, nbins=5):
     Returns:
         None
     """
-    # remove preprints where the first version is within the last 6 months
-    latest_date = df["date"].max()
-    df = df.groupby("doi").filter(lambda x: (latest_date - x["date"].min()).days > 182)
 
     num_versions = pd.Series(df.groupby("doi")["version"].max().tolist()).value_counts()
 
@@ -517,7 +514,7 @@ def main():
 
     proportion_with_revision = plot_proportion_with_revision(df_dropped, output_dir)
 
-    num_versions_distribution(df, output_dir)
+    num_versions_distribution(df_dropped, output_dir)
 
     save_to_json(
         {
