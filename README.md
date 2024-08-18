@@ -19,7 +19,7 @@ just setup
 The project uses DVC (Data Version Control) to manage the data pipeline. To run the entire pipeline, use:
 
 ```
-dvc repr
+dvc repro
 ```
 
 To run individual sections of the pipeline, use:

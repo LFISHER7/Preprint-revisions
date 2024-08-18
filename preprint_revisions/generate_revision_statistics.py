@@ -36,7 +36,7 @@ def drop_incomplete_revision_history(df):
 
     # Drop DOIs where the first version is within 12 months of the end of the study period
     df_dropped_end = df.groupby("doi").filter(
-        lambda x: (latest_date - x["date"].min()).days > 182
+        lambda x: (latest_date - x["date"].min()).days > 365
     )
 
     num_preprints_post_drop = df_dropped_end["doi"].nunique()
@@ -116,9 +116,12 @@ def calculate_proportion_with_revision(df):
         proportion_with_revision (float): The mean proportion of preprints that have a revision.
         proportion_with_revision_over_time (pandas.Series): The proportion of preprints that have a revision over time.
     """
-    proportion_with_revision = df.groupby("doi")["has_revision"].any().mean() * 100
+    first_versions = df[df["version"] == 1]
+    proportion_with_revision = (
+        first_versions.groupby("doi")["has_revision"].any().mean() * 100
+    )
     proportion_with_revision_over_time = (
-        df.groupby(["doi", "date_month"])["has_revision"]
+        first_versions.groupby(["doi", "date_month"])["has_revision"]
         .any()
         .groupby("date_month")
         .mean()
@@ -144,9 +147,6 @@ def plot_proportion_with_revision(df, output_dir, figsize=(10, 5)):
         proportion_with_revision,
         proportion_with_revision_over_time,
     ) = calculate_proportion_with_revision(df)
-
-    # remove last 6 months
-    proportion_with_revision_over_time = proportion_with_revision_over_time[:-6]
 
     plt.figure(figsize=figsize)
     plt.plot(proportion_with_revision_over_time, color="#EF4444")
@@ -174,9 +174,6 @@ def num_versions_distribution(df, output_dir, nbins=5):
     Returns:
         None
     """
-    # remove preprints where the first version is within the last 6 months
-    latest_date = df["date"].max()
-    df = df.groupby("doi").filter(lambda x: (latest_date - x["date"].min()).days > 182)
 
     num_versions = pd.Series(df.groupby("doi")["version"].max().tolist()).value_counts()
 
@@ -334,13 +331,19 @@ def find_changes(df):
 
     for _, group in df.groupby("doi"):
         group = group.sort_values("version")
-        group["title_changed"] = group["title"].ne(group["title"].shift())
-        group["abstract_changed"] = group["abstract"].ne(group["abstract"].shift())
-        group["authors_changed"] = group["authors"].ne(group["authors"].shift())
+        group["title_changed"] = (
+            group["title"].ne(group["title"].shift()).astype("boolean")
+        )
+        group["abstract_changed"] = (
+            group["abstract"].ne(group["abstract"].shift()).astype("boolean")
+        )
+        group["authors_changed"] = (
+            group["authors"].ne(group["authors"].shift()).astype("boolean")
+        )
         group.loc[
             group["version"] == 1,
             ["title_changed", "abstract_changed", "authors_changed"],
-        ] = None
+        ] = np.nan
         updated_dfs.append(group)
 
     return pd.concat(updated_dfs)
@@ -420,21 +423,31 @@ def plot_most_revised_preprints(revision_traces, output_dir):
     Returns:
         None
     """
-    most_revised = get_most_revised_preprints(revision_traces)
+    most_revised = get_most_revised_preprints(revision_traces, n=25)
+
     cumulative_times = []
+    dois = []
 
-    for _, times in most_revised:
+    for doi, times in most_revised:
         cumulative_times.append([sum(times[:j]) for j in range(len(times))])
+        dois.append(doi)
 
-    cumulative_times = sorted(cumulative_times, key=lambda x: x[-1])
+    # Sort cumulative_times and dois based on the last cumulative time
+    sorted_data = sorted(zip(cumulative_times, dois), key=lambda x: x[0][-1])
+    cumulative_times, dois = zip(*sorted_data)
 
-    plt.figure(figsize=(15, 12))
+    # Create DataFrame with DOIs and cumulative times
+    df = pd.DataFrame(cumulative_times, index=dois)
+    df.index.name = "DOI"
+    df.to_csv(f"{output_dir}/most_revised_preprints.csv")
+
+    plt.figure(figsize=(10, 5))
     for i, times in enumerate(cumulative_times):
         plt.plot(
             times,
             i * np.ones(len(times)),
             marker="o",
-            markersize=5,
+            markersize=7,
             markerfacecolor="#EF4444",
             linewidth=3,
             color="#d4d8d4",
@@ -515,9 +528,9 @@ def main():
 
     plot_preprints_over_time(df, output_dir)
 
-    proportion_with_revision = plot_proportion_with_revision(df, output_dir)
+    proportion_with_revision = plot_proportion_with_revision(df_dropped, output_dir)
 
-    num_versions_distribution(df, output_dir)
+    num_versions_distribution(df_dropped, output_dir)
 
     save_to_json(
         {

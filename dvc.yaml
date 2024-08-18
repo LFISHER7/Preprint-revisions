@@ -1,6 +1,6 @@
 stages:
   get_preprint_data_medrxiv:
-    cmd: python preprint_revisions/get_preprint_data.py --start_date 2019-01-01 --end_date 2023-07-01 --filename "extracted_medrxiv.json" --server "medrxiv"
+    cmd: python preprint_revisions/get_preprint_data.py --start_date 2019-01-01 --end_date 2024-07-01 --filename "extracted_medrxiv.json" --server "medrxiv"
     deps:
     - preprint_revisions/get_preprint_data.py
     outs:
@@ -11,7 +11,6 @@ stages:
     deps:
     - preprint_revisions/get_revisions.py
     - data/extracted_medrxiv.json
-    - data/medrxiv_urls.json
     outs:
     - data/revision_dict_medrxiv.json
 
@@ -39,5 +38,6 @@ stages:
     - results/medrxiv/revision_text_stats.json
     - results/medrxiv/revision_time_stats.json
     - results/medrxiv/revision_times_most_revised.png
+    - results/medrxiv/most_revised_preprints.csv
     - results/medrxiv/revision_times.png
     - data/medrxiv_revision_traces.json
