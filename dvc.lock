@@ -2,48 +2,45 @@ schema: '2.0'
 stages:
   get_preprint_data_medrxiv:
     cmd: python preprint_revisions/get_preprint_data.py --start_date 2019-01-01 --end_date
-      2023-07-01 --filename "extracted_medrxiv.json" --server "medrxiv"
+      2024-07-01 --filename "extracted_medrxiv.json" --server "medrxiv"
     deps:
     - path: preprint_revisions/get_preprint_data.py
       md5: cb6f9f059dffdf4c50e32e686d72efd3
       size: 1951
     outs:
     - path: data/extracted_medrxiv.json
-      md5: 925bfb9cfca00812d417bc7929dfe5e6
-      size: 143589729
+      md5: 936943f1537b3dce016f96af2d5d5401
+      size: 182605123
   get_revisions_medrxiv:
     cmd: python preprint_revisions/get_revisions.py --preprint-data-file "extracted_medrxiv.json"
     deps:
     - path: data/extracted_medrxiv.json
-      md5: 925bfb9cfca00812d417bc7929dfe5e6
-      size: 143589729
-    - path: data/medrxiv_urls.json
-      md5: 94787d8c7dd57019b2bb9a3cd854d58f
-      size: 3040584
+      md5: 936943f1537b3dce016f96af2d5d5401
+      size: 182605123
     - path: preprint_revisions/get_revisions.py
       md5: 429972c4d4183d1fd95bbae54738174e
       size: 4680
     outs:
     - path: data/revision_dict_medrxiv.json
-      md5: 5feb745bd648e9c0723c82a4c51afeae
-      size: 1870802
+      md5: 0f5a625aa74f33ef9c8604e5d3bd850e
+      size: 2444783
   process_data_medrxiv:
     cmd: python preprint_revisions/process_data.py --preprint-data-file "extracted_medrxiv.json"
       --revision-data-file "revision_dict_medrxiv.json"
     deps:
     - path: data/extracted_medrxiv.json
-      md5: 925bfb9cfca00812d417bc7929dfe5e6
-      size: 143589729
+      md5: 936943f1537b3dce016f96af2d5d5401
+      size: 182605123
     - path: data/revision_dict_medrxiv.json
-      md5: 5feb745bd648e9c0723c82a4c51afeae
-      size: 1870802
+      md5: 0f5a625aa74f33ef9c8604e5d3bd850e
+      size: 2444783
     - path: preprint_revisions/get_revisions.py
       md5: 429972c4d4183d1fd95bbae54738174e
       size: 4680
     outs:
     - path: data/preprint_revision_df_medrxiv.csv
-      md5: cd5363fd8fbf43886665cdc06ad6ce07
-      size: 133069109
+      md5: 95bbadbd00093b001f5f2a0292748bea
+      size: 169505425
   get_revision_statistics_medrxiv:
     cmd: python preprint_revisions/generate_revision_statistics.py --data-file "preprint_revision_df_medrxiv.csv"
     deps:
