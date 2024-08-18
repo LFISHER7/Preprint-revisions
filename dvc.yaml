@@ -39,5 +39,6 @@ stages:
     - results/medrxiv/revision_text_stats.json
     - results/medrxiv/revision_time_stats.json
     - results/medrxiv/revision_times_most_revised.png
+    - results/medrxiv/most_revised_preprints.csv
     - results/medrxiv/revision_times.png
     - data/medrxiv_revision_traces.json

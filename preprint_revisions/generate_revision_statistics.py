@@ -423,21 +423,31 @@ def plot_most_revised_preprints(revision_traces, output_dir):
     Returns:
         None
     """
-    most_revised = get_most_revised_preprints(revision_traces)
+    most_revised = get_most_revised_preprints(revision_traces, n=25)
+
     cumulative_times = []
+    dois = []
 
-    for _, times in most_revised:
+    for doi, times in most_revised:
         cumulative_times.append([sum(times[:j]) for j in range(len(times))])
+        dois.append(doi)
 
-    cumulative_times = sorted(cumulative_times, key=lambda x: x[-1])
+    # Sort cumulative_times and dois based on the last cumulative time
+    sorted_data = sorted(zip(cumulative_times, dois), key=lambda x: x[0][-1])
+    cumulative_times, dois = zip(*sorted_data)
 
-    plt.figure(figsize=(15, 12))
+    # Create DataFrame with DOIs and cumulative times
+    df = pd.DataFrame(cumulative_times, index=dois)
+    df.index.name = "DOI"
+    df.to_csv(f"{output_dir}/most_revised_preprints.csv")
+
+    plt.figure(figsize=(10, 5))
     for i, times in enumerate(cumulative_times):
         plt.plot(
             times,
             i * np.ones(len(times)),
             marker="o",
-            markersize=5,
+            markersize=7,
             markerfacecolor="#EF4444",
             linewidth=3,
             color="#d4d8d4",
