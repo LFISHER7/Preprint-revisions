@@ -331,13 +331,19 @@ def find_changes(df):
 
     for _, group in df.groupby("doi"):
         group = group.sort_values("version")
-        group["title_changed"] = group["title"].ne(group["title"].shift())
-        group["abstract_changed"] = group["abstract"].ne(group["abstract"].shift())
-        group["authors_changed"] = group["authors"].ne(group["authors"].shift())
+        group["title_changed"] = (
+            group["title"].ne(group["title"].shift()).astype("boolean")
+        )
+        group["abstract_changed"] = (
+            group["abstract"].ne(group["abstract"].shift()).astype("boolean")
+        )
+        group["authors_changed"] = (
+            group["authors"].ne(group["authors"].shift()).astype("boolean")
+        )
         group.loc[
             group["version"] == 1,
             ["title_changed", "abstract_changed", "authors_changed"],
-        ] = None
+        ] = np.nan
         updated_dfs.append(group)
 
     return pd.concat(updated_dfs)
