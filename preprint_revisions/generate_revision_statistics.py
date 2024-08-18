@@ -36,7 +36,7 @@ def drop_incomplete_revision_history(df):
 
     # Drop DOIs where the first version is within 12 months of the end of the study period
     df_dropped_end = df.groupby("doi").filter(
-        lambda x: (latest_date - x["date"].min()).days > 182
+        lambda x: (latest_date - x["date"].min()).days > 365
     )
 
     num_preprints_post_drop = df_dropped_end["doi"].nunique()
@@ -116,9 +116,12 @@ def calculate_proportion_with_revision(df):
         proportion_with_revision (float): The mean proportion of preprints that have a revision.
         proportion_with_revision_over_time (pandas.Series): The proportion of preprints that have a revision over time.
     """
-    proportion_with_revision = df.groupby("doi")["has_revision"].any().mean() * 100
+    first_versions = df[df["version"] == 1]
+    proportion_with_revision = (
+        first_versions.groupby("doi")["has_revision"].any().mean() * 100
+    )
     proportion_with_revision_over_time = (
-        df.groupby(["doi", "date_month"])["has_revision"]
+        first_versions.groupby(["doi", "date_month"])["has_revision"]
         .any()
         .groupby("date_month")
         .mean()
@@ -144,9 +147,6 @@ def plot_proportion_with_revision(df, output_dir, figsize=(10, 5)):
         proportion_with_revision,
         proportion_with_revision_over_time,
     ) = calculate_proportion_with_revision(df)
-
-    # remove last 6 months
-    proportion_with_revision_over_time = proportion_with_revision_over_time[:-6]
 
     plt.figure(figsize=figsize)
     plt.plot(proportion_with_revision_over_time, color="#EF4444")
@@ -515,7 +515,7 @@ def main():
 
     plot_preprints_over_time(df, output_dir)
 
-    proportion_with_revision = plot_proportion_with_revision(df, output_dir)
+    proportion_with_revision = plot_proportion_with_revision(df_dropped, output_dir)
 
     num_versions_distribution(df, output_dir)
 
